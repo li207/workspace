@@ -34,7 +34,7 @@ You are managing tasks using the Workspace TODO system with natural language pro
 
 3. **Extract Task Information**:
    - **Task description**: Clean, organized, actionable title
-   - **Priority**: high/urgent/critical, medium/normal/regular, low/minor
+   - **Priority**: p0/urgent/critical, p1/high, p2/medium/normal, p3/low/minor
    - **Due date**: tomorrow, friday, "feb 15", "2026-02-15", "in 3 days", "next monday"
    - **Tags**: work, personal, health, code, etc.
    - **Context**: Additional details, links, requirements, POCs
@@ -48,26 +48,27 @@ You are managing tasks using the Workspace TODO system with natural language pro
 5. **Execute Operation**:
 
    - **CREATE**: Add new task to `active.md`
+     - Generate unique 6-character random ID
      - Organize title for clarity and actionability
      - Extract context for separate field
      - Parse priority, due date, tags from natural language
-     - Format: `- [ ] <clean-title>`
+     - Format: `- [ ] <clean-title> #id:<random-id>`
      - Include: priority, created, due (if specified), tags (if specified), context (if provided)
    
    - **LIST**: Display numbered active tasks from `active.md`
-     - Number tasks: "1. Fix authentication bug"
+     - Number tasks: "1. Fix authentication bug #abc123"
      - Sort: overdue first (⚠️), then by due date, then priority, then creation date
-     - Show: task number, priority indicator, title, due date
-     - Format: "1. ⚠️ [HIGH] Submit quarterly report (due: 3 days ago)"
+     - Show: task number, priority indicator, title, due date, ID
+     - Format: "1. ⚠️ [P0] Submit quarterly report (due: 3 days ago) #abc123"
    
    - **COMPLETE**: Mark task as done
-     - Parse task reference: "first task", "task 2", "the auth bug"
+     - Parse task reference: "first task", "task 2", "the auth bug", or ID
      - If ambiguous reference, show options and ask for clarification
      - Mark complete and move to archive with completion date
    
    - **UPDATE**: Modify existing task
      - Parse what to change: priority, due date, title, context, tags
-     - Parse which task: by number or description
+     - Parse which task: by number, description, or ID
      - Update the specified fields
    
    - **REVIEW**: Show task summary
@@ -80,8 +81,8 @@ You are managing tasks using the Workspace TODO system with natural language pro
 
 6. **Data Format**: Use the enhanced Workspace TODO format with context:
    ```markdown
-   - [ ] Clean, actionable task title
-     - priority: medium
+   - [ ] Clean, actionable task title #id:abc123
+     - priority: p2
      - created: 2026-01-31
      - due: 2026-02-15
      - tags: [work, urgent]
@@ -127,9 +128,9 @@ An intelligent task management system that understands natural language commands
 /todo new task: update documentation
 
 # With priority (natural language)
-/todo create urgent bug fix for auth system
-/todo add important client meeting, high priority
-/todo make new task to review code, low priority
+/todo create critical bug fix for auth system
+/todo add important client meeting, p1 priority
+/todo make new task to review code, p3 priority
 
 # With due dates (flexible)
 /todo create report task due tomorrow
@@ -144,12 +145,12 @@ An intelligent task management system that understands natural language commands
 /todo new security audit task, reference OWASP guidelines and previous findings
 
 # Everything combined
-/todo create authentication bug fix, high priority, due tomorrow, needs database migration script and rollback plan
+/todo create authentication bug fix, p1 priority, due tomorrow, needs database migration script and rollback plan
 ```
 
 **What gets extracted:**
 - **Title**: Clean, actionable task name
-- **Priority**: high/urgent, medium/normal, low/minor  
+- **Priority**: p0/critical, p1/high, p2/medium, p3/low
 - **Due date**: Smart parsing of dates and times
 - **Tags**: Automatically detected (work, personal, etc.)
 - **Context**: Additional details, requirements, links
@@ -172,10 +173,10 @@ An intelligent task management system that understands natural language commands
 ```
 ## Active Tasks (4 tasks)
 
-1. ⚠️ [HIGH] Submit quarterly report (due: 3 days ago) [OVERDUE]
-2. [HIGH] Fix authentication bug (due: tomorrow)
-3. [MEDIUM] Review code for security issues (due: Feb 10)
-4. [MEDIUM] Buy groceries for the week
+1. ⚠️ [P0] Submit quarterly report (due: 3 days ago) #abc123 [OVERDUE]
+2. [P1] Fix authentication bug (due: tomorrow) #def456
+3. [P2] Review code for security issues (due: Feb 10) #ghi789  
+4. [P2] Buy groceries for the week #jkl012
 ```
 
 #### ✅ **Completing Tasks**
@@ -193,9 +194,9 @@ An intelligent task management system that understands natural language commands
 /todo done with quarterly report
 /todo finished the grocery shopping
 
-# By task number
-/todo complete task 3
-/todo done #1
+# By ID
+/todo complete abc123
+/todo done def456
 ```
 
 #### ✏️ **Updating Tasks**
@@ -203,9 +204,9 @@ An intelligent task management system that understands natural language commands
 **Natural ways to modify tasks:**
 ```bash
 # Change priority
-/todo make first task high priority
-/todo change task 2 to low priority
-/todo urgent: make auth bug task critical
+/todo make first task p1 priority
+/todo change task 2 to p3 priority
+/todo urgent: make auth bug task p0 priority
 
 # Change due dates
 /todo change first task due date to next monday  
@@ -237,19 +238,20 @@ An intelligent task management system that understands natural language commands
 ```
 ## Task Summary
 - Total active tasks: 4
-- High priority: 2  
-- Medium priority: 2
-- Low priority: 0
+- P0 priority: 1  
+- P1 priority: 1
+- P2 priority: 2
+- P3 priority: 0
 
 ⚠️  ## OVERDUE (1 task)
-1. [HIGH] Submit quarterly report (due: 3 days ago)
+1. [P0] Submit quarterly report (due: 3 days ago) #abc123
 
 ## Due This Week (2 tasks)  
-2. [HIGH] Fix authentication bug (due: tomorrow)
-3. [MEDIUM] Review code (due: Feb 10)
+2. [P1] Fix authentication bug (due: tomorrow) #def456
+3. [P2] Review code (due: Feb 10) #ghi789
 
 ## No Due Date (1 task)
-4. [MEDIUM] Buy groceries (created: 5 days ago)
+4. [P2] Buy groceries (created: 5 days ago) #jkl012
 ```
 
 ## Enhanced Data Format
@@ -257,15 +259,15 @@ An intelligent task management system that understands natural language commands
 Tasks are stored with clean titles and detailed context in `workspace-data/todo/active.md`:
 
 ```markdown
-- [ ] Fix authentication bug
-  - priority: high
+- [ ] Fix authentication bug #id:abc123
+  - priority: p1
   - created: 2026-01-31
   - due: 2026-02-02
   - tags: [security, backend]
   - context: Requires database migration script, coordinate with DevOps team, test rollback procedure, reference security audit findings in /docs/security-review.md
 
-- [ ] Update API documentation
-  - priority: medium
+- [ ] Update API documentation #id:def456
+  - priority: p2
   - created: 2026-01-31
   - tags: [documentation, api]
   - context: Include new authentication endpoints, update rate limiting info, add examples for webhook integration
@@ -274,8 +276,8 @@ Tasks are stored with clean titles and detailed context in `workspace-data/todo/
 **Completed tasks** are moved to `archive/YYYY-MM-DD.md`:
 
 ```markdown
-- [x] Fix authentication bug
-  - priority: high
+- [x] Fix authentication bug #id:abc123
+  - priority: p1
   - created: 2026-01-31
   - due: 2026-02-02
   - completed: 2026-02-01
@@ -284,9 +286,10 @@ Tasks are stored with clean titles and detailed context in `workspace-data/todo/
 ```
 
 ## Priority Levels
-- **high** - Urgent, important tasks
-- **medium** - Regular tasks (default)
-- **low** - Nice-to-have tasks
+- **p0** - Critical, urgent tasks (highest priority)
+- **p1** - High priority tasks 
+- **p2** - Medium priority tasks (default)
+- **p3** - Low priority, nice-to-have tasks
 
 ## Daily Workflow
 
@@ -297,7 +300,7 @@ Tasks are stored with clean titles and detailed context in `workspace-data/todo/
 
 ## Tips
 
-- **Task Numbers:** Use the numbered list position or description for precise task management
+- **Task IDs:** Use the 6-character ID for precise task management
 - **Organized descriptions:** The system cleans up your task descriptions automatically
 - **Tags:** Use tags to categorize tasks (e.g., work, personal, health)
 - **Keep it active:** Focus on tasks you're actually working on

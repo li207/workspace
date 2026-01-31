@@ -111,7 +111,7 @@ Brief description of module purpose and capabilities.
 
 ### Primary Entity
 ```markdown
-- [ ] Entity title
+- [ ] Entity title #id:abc123
   - field1: value
   - field2: value
   - created: YYYY-MM-DD
@@ -230,7 +230,7 @@ Knowledge management with linking and organization.
 
 ## Data Format
 ```markdown
-# Note Title
+# Note Title #id:abc123
 - created: 2026-01-31
 - tags: [research, project-x]
 - links: [[Other Note]], [[Project Status]]
@@ -259,8 +259,9 @@ Knowledge management with linking and organization.
 
 #### Data Structure
 ```markdown
-- [ ] Meeting with client
+- [ ] Meeting with client #id:abc123
   - type: meeting
+  - priority: p1
   - start: 2026-02-01 14:00
   - duration: 60
   - attendees: [client, pm, dev-lead]

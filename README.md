@@ -30,11 +30,15 @@ The bootstrap will ask for your workspace-data repository:
 # Create tasks naturally
 /todo create bug fix task, urgent, due tomorrow
 
+# Create isolated workspace for task
+/workspace create workspace for task 1769a4
+
 # Check your workload  
 /todo review
 
-# See all tasks
+# See all tasks and workspaces
 /todo list
+/workspace list
 
 # Complete work
 /todo mark first task as done
@@ -49,9 +53,11 @@ The bootstrap will ask for your workspace-data repository:
 ```
 workspace/                    # 🔓 Public Framework (this repo)
 ├── commands/                 # Global Claude commands 
-│   └── todo.md              # Natural language TODO processor
+│   ├── todo.md              # Natural language TODO processor
+│   └── workspace.md         # Natural language workspace manager
 ├── modules/                  # Module definitions
-│   └── todo/                # TODO system documentation
+│   ├── todo/                # TODO system documentation
+│   └── workspace/           # Workspace system documentation
 ├── scripts/                  # Automation tools
 │   ├── bootstrap.sh         # Setup script
 │   └── sync.sh             # Dual-repo sync
@@ -59,10 +65,17 @@ workspace/                    # 🔓 Public Framework (this repo)
 └── CLAUDE.md               # Quick reference
 
 workspace-data/              # 🔒 Private Data (separate repo)
-└── todo/                   
-    ├── active.md           # Current tasks
-    └── archive/            # Completed tasks by date
-        └── 2026-01-31.md
+├── todo/                   
+│   ├── active.md           # Current tasks
+│   └── archive/            # Completed tasks by date
+│       └── 2026-01-31.md
+└── workspace/              # Isolated task workspaces
+    ├── 1769a4/            # Task-specific workspace
+    │   ├── README.md      # Workspace overview
+    │   ├── docs/          # Documentation
+    │   ├── logs/          # Investigation logs
+    │   └── scratch/       # Temporary files
+    └── 176984/            # Another task workspace
 ```
 
 ### Privacy Model
@@ -91,6 +104,25 @@ Intelligent task management that understands conversational commands:
 /todo review                        # Summary with overdue alerts
 /todo what's due this week?         # Filtered view
 /todo show my current workload      # Status overview
+```
+
+### 📁 Natural Language Workspaces
+Isolated task-specific environments that understand conversational commands:
+
+```bash
+# Creating workspaces
+/workspace create workspace for task 1769a4
+/workspace make debug environment for auth bug
+/workspace setup docs folder for API task
+
+# Accessing workspaces
+/workspace open 1769a4              # Navigate to workspace
+/workspace list                     # See all workspaces
+/workspace info auth bug            # Workspace details
+
+# Managing workspaces
+/workspace clean completed workspaces
+/workspace help                     # Comprehensive workspace guide
 ```
 
 ## Multi-User Setup

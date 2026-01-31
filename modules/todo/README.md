@@ -17,8 +17,8 @@ Tasks are stored in markdown files within `workspace-data/todo/`. The system mai
 
 ### Active Task
 ```markdown
-- [ ] Write comprehensive project proposal
-  - priority: high
+- [ ] Write comprehensive project proposal #id:a1b2c3
+  - priority: p1
   - created: 2026-01-30
   - due: 2026-02-15
   - tags: [work, writing]
@@ -27,8 +27,8 @@ Tasks are stored in markdown files within `workspace-data/todo/`. The system mai
 
 ### Completed Task
 ```markdown
-- [x] Review pull request
-  - priority: medium
+- [x] Review pull request #id:d4e5f6
+  - priority: p2
   - created: 2026-01-28
   - due: 2026-01-30
   - completed: 2026-01-29
@@ -40,7 +40,8 @@ Tasks are stored in markdown files within `workspace-data/todo/`. The system mai
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `priority` | No | `high`, `medium`, `low` (default: medium) |
+| `#id:` | Yes | Unique 6-char random identifier (in task title) |
+| `priority` | No | `p0`, `p1`, `p2`, `p3` (default: p2) |
 | `created` | Yes | Creation date in YYYY-MM-DD format |
 | `due` | No | Due date in YYYY-MM-DD format |
 | `completed` | On completion | Completion date |
@@ -65,9 +66,9 @@ todo add meeting with client
 todo new task: update documentation
 
 # With natural priority
-todo create urgent security fix for login system
-todo add important client presentation, high priority  
-todo make low priority task to organize files
+todo create critical security fix for login system
+todo add important client presentation, p1 priority  
+todo make p3 priority task to organize files
 
 # With flexible due dates
 todo create report task due tomorrow
@@ -86,7 +87,7 @@ todo create authentication system overhaul, critical priority, due end of sprint
 
 **What gets organized:**
 - **Title**: "create authentication system overhaul" → "Overhaul authentication system"
-- **Priority**: "critical", "urgent" → high; "important" → medium; "low priority" → low  
+- **Priority**: "critical", "urgent" → p0; "important" → p1; "low priority" → p3  
 - **Due dates**: "tomorrow", "friday", "feb 15th", "end of sprint" → parsed dates
 - **Context**: Everything after commas gets extracted to context field
 - **Tags**: Auto-detected from context (security, api, etc.)
@@ -100,19 +101,19 @@ Display all active tasks.
 ```
 ## Active Tasks (3 tasks)
 
-1. [HIGH] Submit quarterly report
-2. [MEDIUM] Buy groceries for the week
-3. [MEDIUM] Call dentist to schedule checkup
+1. [P1] Submit quarterly report #id:a1b2c3
+2. [P2] Buy groceries for the week #id:d4e5f6
+3. [P2] Call dentist to schedule checkup #id:g7h8i9
 ```
 
 ### Complete Task
 Mark a task as done and move to archive.
 
-**Usage:** `todo done "<description or task number>"`
+**Usage:** `todo done "<description or id>"`
 
 **Examples:**
 ```
-todo done "task 1"
+todo done "a1b2c3"
 todo done "Buy groceries"
 ```
 
@@ -125,12 +126,13 @@ Show summary of active tasks.
 ```
 ## Task Summary
 - Total active tasks: 3
-- High priority: 1
-- Medium priority: 2
-- Low priority: 0
+- P0 priority: 0
+- P1 priority: 1
+- P2 priority: 2
+- P3 priority: 0
 
 ## Oldest Tasks (need attention)
-1. [HIGH] Submit quarterly report (created: 5 days ago)
+1. [P1] Submit quarterly report (created: 5 days ago) #id:a1b2c3
 ```
 
 ### Help
