@@ -1,10 +1,10 @@
-# Workplace
+# Workspace
 
 An intelligent, extensible workspace framework for Claude AI with natural language command processing.
 
 ## What is this?
 
-Workplace is a modular framework that brings intelligent task management and data organization to Claude AI. It features:
+Workspace is a modular framework that brings intelligent task management and data organization to Claude AI. It features:
 
 - **🧠 Natural Language Processing** — Talk to your tasks naturally
 - **🔒 Privacy-First Architecture** — Your data stays separate and private  
@@ -16,12 +16,12 @@ Workplace is a modular framework that brings intelligent task management and dat
 
 ### 1. Clone and Setup
 ```bash
-git clone https://github.com/li207/workplace
-cd workplace
+git clone https://github.com/li207/workspace
+cd workspace
 ./bootstrap.sh
 ```
 
-The bootstrap will ask for your workplace-data repository:
+The bootstrap will ask for your workspace-data repository:
 - **Press Enter** to create a local data repo
 - **Enter URL** to clone existing private workspace data
 
@@ -47,7 +47,7 @@ The bootstrap will ask for your workplace-data repository:
 
 ### Framework Structure
 ```
-workplace/                    # 🔓 Public Framework (this repo)
+workspace/                    # 🔓 Public Framework (this repo)
 ├── commands/                 # Global Claude commands 
 │   └── todo.md              # Natural language TODO processor
 ├── modules/                  # Module definitions
@@ -58,7 +58,7 @@ workplace/                    # 🔓 Public Framework (this repo)
 ├── instructions.md          # Claude context
 └── CLAUDE.md               # Quick reference
 
-workplace-data/              # 🔒 Private Data (separate repo)
+workspace-data/              # 🔒 Private Data (separate repo)
 └── todo/                   
     ├── active.md           # Current tasks
     └── archive/            # Completed tasks by date
@@ -96,8 +96,8 @@ Intelligent task management that understands conversational commands:
 ## Multi-User Setup
 
 ### For Teams
-1. **Share Framework**: Everyone clones the same workplace repo
-2. **Private Data**: Each person creates their own workplace-data repo
+1. **Share Framework**: Everyone clones the same workspace repo
+2. **Private Data**: Each person creates their own workspace-data repo
 3. **Stay Updated**: Pull framework updates, keep data separate
 
 ### Personal Setup Options
@@ -105,13 +105,13 @@ Intelligent task management that understands conversational commands:
 **Option A: Private GitHub Repo**
 ```bash
 ./bootstrap.sh  # Press Enter for local
-cd workplace-data
+cd workspace-data
 gh repo create my-workspace --private --source=. --push
 ```
 
 **Option B: Clone Existing Data**
 ```bash
-./bootstrap.sh  # Enter your existing workplace-data URL
+./bootstrap.sh  # Enter your existing workspace-data URL
 # https://github.com/yourusername/your-workspace-data
 ```
 
@@ -130,7 +130,7 @@ gh repo create my-workspace --private --source=. --push
 
 ### Adding New Modules
 1. Create `modules/modulename/README.md` with specifications
-2. Add data structures to `workplace-data/modulename/`
+2. Add data structures to `workspace-data/modulename/`
 3. Optionally create global commands for the module
 
 ### Adding Skills

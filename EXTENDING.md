@@ -1,10 +1,10 @@
-# Extending Workplace
+# Extending Workspace
 
-A comprehensive guide for adding new functionality to the Workplace framework.
+A comprehensive guide for adding new functionality to the Workspace framework.
 
 ## Overview
 
-Workplace is designed for extensibility through three main mechanisms:
+Workspace is designed for extensibility through three main mechanisms:
 1. **Global Commands** — Natural language processors available everywhere
 2. **Modules** — Feature specifications with data structures
 3. **Skills** — Specialized Claude behaviors for complex tasks
@@ -21,7 +21,7 @@ Workplace is designed for extensibility through three main mechanisms:
 ├─────────────────────────────────────────────────────┤
 │ Modules (Feature Specifications)                    │
 │ ├─ Documentation in modules/module-name/            │
-│ ├─ Data storage in workplace-data/module-name/      │
+│ ├─ Data storage in workspace-data/module-name/      │
 │ └─ Integration patterns and formats                 │
 ├─────────────────────────────────────────────────────┤
 │ Skills (Specialized Behaviors)                      │
@@ -56,8 +56,8 @@ You are processing a natural language command for [module/feature].
 ## Your Task:
 
 1. **Load Configuration**: 
-   - Read workplace paths from `~/.claude/workplace-path.txt`
-   - Use `WORKPLACE_DATA_DIR/module-name/` for data operations
+   - Read workspace paths from `~/.claude/workspace-path.txt`
+   - Use `WORKSPACE_DATA_DIR/module-name/` for data operations
 
 2. **Parse Natural Language**:
    - Identify intent: create, list, update, delete, etc.
@@ -134,9 +134,9 @@ Brief description of module purpose and capabilities.
 ```
 
 ## File Organization
-- `workplace-data/module-name/active.md` — Current items
-- `workplace-data/module-name/archive/` — Completed/old items
-- `workplace-data/module-name/[other-files].md` — Additional data
+- `workspace-data/module-name/active.md` — Current items
+- `workspace-data/module-name/archive/` — Completed/old items
+- `workspace-data/module-name/[other-files].md` — Additional data
 
 ## Integration Points
 - How this module can work with other modules
@@ -145,12 +145,12 @@ Brief description of module purpose and capabilities.
 ```
 
 ### 2. Create Data Structure
-**Location**: `workplace-data/module-name/`
+**Location**: `workspace-data/module-name/`
 
 Create the necessary directories and initial files:
 ```bash
-mkdir -p workplace-data/module-name/archive
-touch workplace-data/module-name/active.md
+mkdir -p workspace-data/module-name/archive
+touch workspace-data/module-name/active.md
 # Add other initial files as needed
 ```
 
@@ -288,7 +288,7 @@ Knowledge management with linking and organization.
 4. **Data Portability**: Formats that can be used outside the system
 
 ### Privacy & Security
-1. **Data Separation**: Always keep personal data in `workplace-data/`
+1. **Data Separation**: Always keep personal data in `workspace-data/`
 2. **No Secrets**: Never commit sensitive information to framework repo
 3. **Local Control**: User controls their own data repository
 4. **Gitignore Compliance**: Ensure private data stays private
@@ -312,4 +312,4 @@ Knowledge management with linking and organization.
 
 ---
 
-The Workplace framework grows stronger with each thoughtful extension that maintains the core principles of natural language interaction, privacy, and human-readable data.
+The Workspace framework grows stronger with each thoughtful extension that maintains the core principles of natural language interaction, privacy, and human-readable data.

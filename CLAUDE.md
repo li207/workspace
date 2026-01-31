@@ -1,6 +1,6 @@
 # Claude Code Configuration
 
-Quick reference for Claude Code CLI sessions in the Workplace framework.
+Quick reference for Claude Code CLI sessions in the Workspace framework.
 
 ## Quick Reference
 
@@ -49,7 +49,7 @@ The TODO system uses conversational commands that work from anywhere:
 ## File Locations
 
 - **Framework docs**: `/modules/`
-- **Personal data**: `/workplace-data/` (private, gitignored)
+- **Personal data**: `/workspace-data/` (private, gitignored)
 - **Global commands**: `/commands/` → `~/.claude/commands/`
 - **Skills**: `/.skills/`
 
@@ -57,7 +57,7 @@ The TODO system uses conversational commands that work from anywhere:
 
 When starting a session in this workspace:
 1. Read `instructions.md` for full context and extension patterns
-2. Check `workplace-data/todo/active.md` for current tasks
+2. Check `workspace-data/todo/active.md` for current tasks
 3. Run `/todo review` to see what needs attention
 4. Explore `/todo help` for natural language examples
 
@@ -93,7 +93,7 @@ When starting a session in this workspace:
 
 ### Adding Modules  
 1. Document in `modules/module-name/README.md`
-2. Store data in `workplace-data/module-name/`
+2. Store data in `workspace-data/module-name/`
 3. Optional: Create global commands and skills
 
 ### Future Commands

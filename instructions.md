@@ -1,4 +1,4 @@
-# Workplace - Intelligent Workspace Framework
+# Workspace - Intelligent Workspace Framework
 
 An extensible, Claude-native workspace system featuring natural language processing and modular architecture.
 
@@ -14,7 +14,7 @@ An extensible, Claude-native workspace system featuring natural language process
 ## Directory Structure
 
 ```
-workplace/                          # 🔓 Framework Repository (shareable)
+workspace/                          # 🔓 Framework Repository (shareable)
 ├── instructions.md                 # This file - master context for Claude
 ├── CLAUDE.md                       # Claude Code shortcuts
 ├── README.md                       # Public documentation
@@ -38,7 +38,7 @@ workplace/                          # 🔓 Framework Repository (shareable)
 │   ├── bootstrap.sh               # Moved to root
 │   └── sync.sh                    # Dual-repo syncing
 │
-└── workplace-data/                 # 🔒 Private Data Repository (gitignored)
+└── workspace-data/                 # 🔒 Private Data Repository (gitignored)
     ├── todo/                       # Task management data
     │   ├── active.md              # Current tasks with context
     │   └── archive/               # Completed tasks by date
@@ -52,7 +52,7 @@ workplace/                          # 🔓 Framework Repository (shareable)
 ### 🗣️ Natural Language TODO (`/todo`)
 **Location**: Global command - works from anywhere
 **Processor**: `commands/todo.md`
-**Data**: `workplace-data/todo/`
+**Data**: `workspace-data/todo/`
 
 **Natural Language Examples:**
 ```bash
@@ -112,7 +112,7 @@ args:
    - Natural language patterns
    - Integration guidelines
 
-2. **Data Structure**: `workplace-data/module-name/` for storage
+2. **Data Structure**: `workspace-data/module-name/` for storage
 3. **Commands**: Optional global commands in `commands/`
 4. **Skills**: Optional specialized skills in `.skills/`
 
@@ -132,7 +132,7 @@ args:
 
 ### Extension Guidelines
 - **Natural Language First** — Design for conversational interaction
-- **Data Separation** — Keep personal data in `workplace-data/`
+- **Data Separation** — Keep personal data in `workspace-data/`
 - **Privacy Aware** — Never commit personal data to framework repo
 - **Documentation Driven** — Specify formats and patterns clearly
 - **Interoperable** — Modules should work together when possible
@@ -143,7 +143,7 @@ When Claude starts in this directory:
 
 1. **Read Context**: This instructions.md provides system understanding
 2. **Module Access**: Refer to `modules/<name>/README.md` for specifics
-3. **Data Location**: All personal operations in `workplace-data/`
+3. **Data Location**: All personal operations in `workspace-data/`
 4. **Commands Available**: Global commands work from anywhere
 5. **Extension Patterns**: Follow documented patterns for new features
 
@@ -155,12 +155,12 @@ When Claude starts in this directory:
    - **Sharing**: Public or team-shared
    - **Updates**: Pull to get new features and improvements
 
-2. **Data Repository** (`workplace-data/`):
+2. **Data Repository** (`workspace-data/`):
    - **Scope**: Personal tasks, notes, and information
    - **Sharing**: Private individual repositories  
    - **Updates**: Independent personal data management
 
-3. **Isolation**: `workplace-data/` gitignored from framework repo
+3. **Isolation**: `workspace-data/` gitignored from framework repo
 
 ### Multi-User Benefits
 - **Teams**: Share framework improvements, keep data private
@@ -180,7 +180,7 @@ When Claude starts in this directory:
 ### Personal Customization
 1. **Commands**: Add custom commands to `commands/`
 2. **Modules**: Define personal module specifications
-3. **Data**: Structure personal data in `workplace-data/`
+3. **Data**: Structure personal data in `workspace-data/`
 4. **Skills**: Create specialized Claude behaviors
 5. **Sync**: Use sync script for dual-repo management
 

@@ -9,18 +9,18 @@ args:
     required: true
 ---
 
-You are managing tasks using the Workplace TODO system with natural language processing.
+You are managing tasks using the Workspace TODO system with natural language processing.
 
 ## User Command: {{command}}
 
 ## Your Task:
 
-1. **Load Workplace Configuration**: 
-   - Read workplace paths from `~/.claude/workplace-path.txt` which contains:
-     - `WORKPLACE_DIR=<framework-path>`
-     - `WORKPLACE_DATA_DIR=<data-path>`
+1. **Load Workspace Configuration**: 
+   - Read workspace paths from `~/.claude/workspace-path.txt` which contains:
+     - `WORKSPACE_DIR=<framework-path>`
+     - `WORKSPACE_DATA_DIR=<data-path>`
    - If config file doesn't exist, inform user to run bootstrap script first
-   - Use `WORKPLACE_DATA_DIR/todo/` for all TODO operations
+   - Use `WORKSPACE_DATA_DIR/todo/` for all TODO operations
 
 2. **Parse Natural Language Command**: 
    - Analyze the user's command to determine intent and extract information
@@ -78,7 +78,7 @@ You are managing tasks using the Workplace TODO system with natural language pro
    
    - **HELP**: Display natural language usage guide
 
-6. **Data Format**: Use the enhanced Workplace TODO format with context:
+6. **Data Format**: Use the enhanced Workspace TODO format with context:
    ```markdown
    - [ ] Clean, actionable task title
      - priority: medium
@@ -89,7 +89,7 @@ You are managing tasks using the Workplace TODO system with natural language pro
    ```
 
 7. **Error Handling**: 
-   - If no workplace found: Inform user and suggest running bootstrap script
+   - If no workspace found: Inform user and suggest running bootstrap script
    - If task not found: Show numbered task list to help user identify the right one
    - If command is ambiguous: Ask for clarification with specific options
    - If date is unclear: Ask which specific date is meant
@@ -254,7 +254,7 @@ An intelligent task management system that understands natural language commands
 
 ## Enhanced Data Format
 
-Tasks are stored with clean titles and detailed context in `workplace-data/todo/active.md`:
+Tasks are stored with clean titles and detailed context in `workspace-data/todo/active.md`:
 
 ```markdown
 - [ ] Fix authentication bug
@@ -304,9 +304,9 @@ Tasks are stored with clean titles and detailed context in `workplace-data/todo/
 - **Archive regularly:** Complete tasks to keep your active list manageable
 
 ## File Locations
-- **Active tasks:** `workplace-data/todo/active.md`
-- **Completed tasks:** `workplace-data/todo/archive/YYYY-MM-DD.md`
-- **Configuration:** `~/.claude/workplace-path.txt`
+- **Active tasks:** `workspace-data/todo/active.md`
+- **Completed tasks:** `workspace-data/todo/archive/YYYY-MM-DD.md`
+- **Configuration:** `~/.claude/workspace-path.txt`
 
 ---
 

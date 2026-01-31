@@ -4,7 +4,7 @@ A simple, markdown-based task management system focused on active work.
 
 ## Overview
 
-Tasks are stored in markdown files within `workplace-data/todo/`. The system maintains a clean separation between active tasks and completed tasks.
+Tasks are stored in markdown files within `workspace-data/todo/`. The system maintains a clean separation between active tasks and completed tasks.
 
 ## File Organization
 
