@@ -47,6 +47,15 @@ The bootstrap will ask for your workspace-data repository:
 /todo help
 ```
 
+### 3. Test the Framework
+```bash
+# Run comprehensive test suite
+./tests/test-runner.sh
+
+# Tests run in isolation - zero risk to your data
+# All tests should pass ✅
+```
+
 ## Architecture
 
 ### Framework Structure

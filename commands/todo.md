@@ -46,6 +46,10 @@ You are managing tasks using the Workspace TODO system with natural language pro
 - Parse task reference: number, description, or ID
 - Move from active.md to archive/YYYY-MM-DD.md with completion date
 - Add completion context if task was significant
+- **Archive workspace integration**: If workspace exists for task ID, move it to archive
+  - Check: `WORKSPACE_DATA_DIR/workspace/{task-id}/`
+  - Move to: `WORKSPACE_DATA_DIR/workspace/archive/{task-id}/`
+  - Preserve all files and update PROGRESS.md with completion status
 
 ### UPDATE
 - Parse what to change: priority, due, title, context, tags
@@ -78,5 +82,7 @@ Load full help: Use Task tool to read `modules/todo/README.md`
 - Config: `~/.claude/workspace-path.txt`
 - Active: `WORKSPACE_DATA_DIR/todo/active.md`
 - Archive: `WORKSPACE_DATA_DIR/todo/archive/YYYY-MM-DD.md`
+- Workspace active: `WORKSPACE_DATA_DIR/workspace/{task-id}/`
+- Workspace archive: `WORKSPACE_DATA_DIR/workspace/archive/{task-id}/`
 
 ARGUMENTS: {{command}}
