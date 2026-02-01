@@ -1,10 +1,142 @@
-# TODO Module
+# TODO Module - Natural Language Task Management
 
-A simple, markdown-based task management system focused on active work.
+An intelligent task management system that understands natural language commands.
 
 ## Overview
 
-Tasks are stored in markdown files within `workspace-data/todo/`. The system maintains a clean separation between active tasks and completed tasks.
+The TODO module provides a natural language interface for task management, with smart parsing of priorities, dates, and context. Tasks are stored in human-readable markdown files with rich metadata.
+
+## Quick Start
+```bash
+/todo create bug fix task, high priority, due tomorrow
+/todo list
+/todo mark first task as done
+/todo review
+```
+
+## Natural Language Commands
+
+### ✨ Creating Tasks
+
+**Natural ways to create tasks:**
+```bash
+# Basic task creation
+/todo create bug fix task
+/todo add meeting with client
+/todo new task: update documentation
+
+# With priority (natural language)
+/todo create critical bug fix for auth system
+/todo add important client meeting, p1 priority
+/todo make new task to review code, p3 priority
+
+# With due dates (flexible)
+/todo create report task due tomorrow
+/todo add client meeting, friday at 2pm
+/todo new task: fix bug, due next monday
+/todo create presentation, due feb 15
+/todo add task due in 3 days: test deployment
+
+# With context and details
+/todo create API integration task, urgent, needs review from team lead and POC testing
+/todo add client demo prep, include latest features and performance metrics
+/todo new security audit task, reference OWASP guidelines and previous findings
+```
+
+### 📋 Viewing Tasks
+
+**Natural ways to see tasks:**
+```bash
+/todo list
+/todo show tasks
+/todo see my tasks
+/todo what's on my list?
+/todo show me what I need to do
+```
+
+### ✅ Completing Tasks
+
+**Natural ways to mark tasks done:**
+```bash
+# By task number (from list)
+/todo mark task 1 as done
+/todo complete the first task
+/todo finish task 2
+
+# By description
+/todo mark the auth bug as complete
+/todo done with quarterly report
+
+# By ID
+/todo complete abc123
+/todo done def456
+```
+
+### ✏️ Updating Tasks
+
+**Natural ways to modify tasks:**
+```bash
+# Change priority
+/todo make first task p1 priority
+/todo change task 2 to p3 priority
+/todo urgent: make auth bug task p0 priority
+
+# Change due dates
+/todo change first task due date to next monday
+/todo move task 2 deadline to friday
+/todo extend grocery task to next week
+```
+
+### 📊 Reviewing Tasks
+
+**Natural ways to get overview:**
+```bash
+/todo review
+/todo status
+/todo summary
+/todo what's my current workload?
+/todo what's overdue?
+/todo show upcoming deadlines
+/todo what's due this week?
+```
+
+## Priority Levels
+- **p0** - Critical, urgent tasks (highest priority)
+- **p1** - High priority tasks
+- **p2** - Medium priority tasks (default)
+- **p3** - Low priority, nice-to-have tasks
+
+## Enhanced Data Format
+
+Tasks are stored with clean titles and detailed context:
+
+```markdown
+- [ ] Fix authentication bug #id:abc123
+  - priority: p1
+  - created: 2026-01-31
+  - due: 2026-02-02
+  - tags: [security, backend]
+  - context: Requires database migration script, coordinate with DevOps team
+```
+
+**Completed tasks** are moved to `archive/YYYY-MM-DD.md`:
+
+```markdown
+- [x] Fix authentication bug #id:abc123
+  - priority: p1
+  - created: 2026-01-31
+  - due: 2026-02-02
+  - completed: 2026-02-01
+  - tags: [security, backend]
+  - context: Database migration completed successfully, rollback tested in staging
+```
+
+## Daily Workflow
+
+1. **Morning:** `/todo review` - See what needs attention
+2. **Add tasks:** `/todo add "task"` - Capture new work
+3. **Stay focused:** `/todo list` - See active tasks
+4. **Complete work:** `/todo done "id"` - Archive finished tasks
 
 ## File Organization
 
