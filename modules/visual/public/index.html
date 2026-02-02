@@ -54,10 +54,10 @@
 
         .dashboard {
             padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -82,17 +82,29 @@
             padding: 16px;
             margin-bottom: 12px;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
 
         .task-card:hover {
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transform: translateY(-1px);
+            border-color: #007aff;
         }
 
         .task-card.priority-p0 { border-left: 4px solid #ff3b30; }
         .task-card.priority-p1 { border-left: 4px solid #ff9500; }
         .task-card.priority-p2 { border-left: 4px solid #34c759; }
         .task-card.priority-p3 { border-left: 4px solid #007aff; }
+
+        .task-card.completed {
+            opacity: 0.7;
+            background: #f9f9f9;
+        }
+
+        .task-card.completed .task-title {
+            text-decoration: line-through;
+            color: #86868b;
+        }
 
         .task-header {
             display: flex;
@@ -108,19 +120,42 @@
             flex: 1;
         }
 
+        .task-badges {
+            display: flex;
+            gap: 6px;
+            margin-left: 8px;
+        }
+
         .task-priority {
             background: #f2f2f7;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
-            margin-left: 8px;
         }
 
         .task-priority.p0 { background: #ff3b30; color: white; }
         .task-priority.p1 { background: #ff9500; color: white; }
         .task-priority.p2 { background: #34c759; color: white; }
         .task-priority.p3 { background: #007aff; color: white; }
+
+        .task-status {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .task-status.not-started { background: #e5e5ea; color: #636366; }
+        .task-status.ongoing { background: #007aff; color: white; }
+        .task-status.finished { background: #34c759; color: white; }
+
+        .task-context {
+            font-size: 13px;
+            color: #636366;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
 
         .task-meta {
             font-size: 14px;
@@ -131,82 +166,36 @@
         .task-due {
             font-size: 12px;
             color: #86868b;
-        }
-
-        .task-due.overdue {
-            color: #ff3b30;
-            font-weight: 500;
-        }
-
-        .workspace-card {
-            border: 1px solid #d2d2d7;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-
-        .workspace-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .workspace-title {
-            font-weight: 600;
-            font-size: 16px;
-            color: #1d1d1f;
-        }
-
-        .workspace-id {
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 12px;
-            color: #86868b;
-            background: #f2f2f7;
+            display: inline-block;
             padding: 2px 6px;
             border-radius: 4px;
         }
 
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #f2f2f7;
-            border-radius: 3px;
-            margin: 8px 0;
-            overflow: hidden;
+        .task-due.due-today {
+            background: #fff3e0;
+            color: #e65100;
+            font-weight: 600;
+            font-size: 13px;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #34c759, #30d158);
-            border-radius: 3px;
-            transition: width 0.3s ease;
+        .task-due.overdue {
+            background: #ffebee;
+            color: #c62828;
+            font-weight: 600;
+            font-size: 13px;
         }
 
-        .progress-text {
-            font-size: 12px;
+        .completed-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e5ea;
+        }
+
+        .completed-section h3 {
+            font-size: 16px;
+            font-weight: 600;
             color: #86868b;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .activity-feed {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .activity-item {
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 14px;
-            background: #f2f2f7;
-        }
-
-        .activity-time {
-            font-size: 12px;
-            color: #86868b;
-            margin-bottom: 4px;
+            margin-bottom: 12px;
         }
 
         .empty-state {
@@ -242,29 +231,290 @@
             background: #ff3b30;
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #86868b;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .modal-close:hover {
+            background: #f2f2f7;
+            color: #1d1d1f;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(80vh - 70px);
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .modal-section h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #86868b;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-section-content {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.6;
+        }
+
+        /* Task metadata grid */
+        .task-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            color: #1d1d1f;
+            font-weight: 500;
+        }
+
+        .meta-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .meta-badge.priority-p0 { background: #ff3b30; color: white; }
+        .meta-badge.priority-p1 { background: #ff9500; color: white; }
+        .meta-badge.priority-p2 { background: #34c759; color: white; }
+        .meta-badge.priority-p3 { background: #007aff; color: white; }
+
+        .meta-badge.status-not-started { background: #e5e5ea; color: #636366; }
+        .meta-badge.status-ongoing { background: #007aff; color: white; }
+        .meta-badge.status-finished { background: #34c759; color: white; }
+
+        .context-box {
+            background: #f5f5f7;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1d1d1f;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-badge {
+            background: #e5e5ea;
+            color: #636366;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        /* Progress sections */
+        .progress-section {
+            background: #f9f9fb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .progress-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-section-content {
+            font-size: 13px;
+            color: #636366;
+            line-height: 1.7;
+        }
+
+        .progress-section-content ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .progress-section-content li {
+            margin-bottom: 6px;
+        }
+
+        .progress-section-content li:last-child {
+            margin-bottom: 0;
+        }
+
+        .accomplishment-item {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-left: 3px solid #34c759;
+        }
+
+        .accomplishment-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .accomplishment-date {
+            font-size: 11px;
+            color: #86868b;
+            margin-bottom: 4px;
+        }
+
+        .blocker-item {
+            background: #fff5f5;
+            border-radius: 6px;
+            padding: 12px;
+            border-left: 3px solid #ff3b30;
+        }
+
+        .no-workspace {
+            text-align: center;
+            padding: 32px 16px;
+            color: #86868b;
+        }
+
+        .no-workspace-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f2f2f7;
+            border-radius: 3px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #34c759, #30d158);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1d1d1f;
+            border: 1px solid #e5e5ea;
+        }
+
+        .progress-content h1,
+        .progress-content h2,
+        .progress-content h3 {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
         @media (max-width: 768px) {
             .dashboard {
-                grid-template-columns: 1fr;
                 padding: 16px;
             }
-            
+
             .header {
                 padding: 16px;
+            }
+
+            .modal {
+                width: 95%;
+                max-height: 90vh;
             }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🎯 Workspace Dashboard</h1>
+        <h1>Workspace Dashboard</h1>
         <div class="status">
             <div class="status-item">
                 <div class="status-indicator"></div>
                 <span id="task-count">Loading...</span>
-            </div>
-            <div class="status-item">
-                <div class="status-indicator"></div>
-                <span id="workspace-count">Loading...</span>
             </div>
             <div class="status-item">
                 <span id="last-update">Starting...</span>
@@ -274,37 +524,37 @@
 
     <div class="dashboard">
         <div class="panel">
-            <h2>📋 Active Tasks</h2>
-            <div id="tasks-container">
-                <div class="empty-state">Loading tasks...</div>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2>🏗️ Workspaces</h2>
-            <div id="workspaces-container">
-                <div class="empty-state">Loading workspaces...</div>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2>📊 Activity Feed</h2>
-            <div id="activity-container" class="activity-feed">
-                <div class="empty-state">No recent activity</div>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2>📈 Overview</h2>
+            <h2>Overview</h2>
             <div id="overview-container">
                 <div class="empty-state">Calculating metrics...</div>
             </div>
+        </div>
+
+        <div class="panel">
+            <h2>Tasks</h2>
+            <div id="tasks-container">
+                <div class="empty-state">Loading tasks...</div>
+            </div>
+            <div id="completed-container"></div>
         </div>
     </div>
 
     <div class="connection-status" id="connection-status">
         <div class="connection-dot" id="connection-dot"></div>
         <span id="connection-text">Connecting...</span>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Task Details</h3>
+                <button class="modal-close" onclick="dashboard.closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic content -->
+            </div>
+        </div>
     </div>
 
     <script src="dashboard.js"></script>

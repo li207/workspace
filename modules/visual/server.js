@@ -117,6 +117,33 @@ class WorkspaceVisualizer {
       });
     });
     
+    // Archived tasks endpoint
+    this.app.get('/api/archived-tasks', (req, res) => {
+      const archivedTasks = this.getRecentArchivedTasks();
+      res.json({
+        tasks: archivedTasks,
+        count: archivedTasks.length,
+        lastUpdated: new Date().toISOString()
+      });
+    });
+
+    // Workspace progress endpoint
+    this.app.get('/api/workspace/:taskId/progress', (req, res) => {
+      const { taskId } = req.params;
+      const progress = this.getWorkspaceProgress(taskId);
+
+      if (!progress) {
+        res.status(404).json({ error: 'Workspace not found or no PROGRESS.md' });
+        return;
+      }
+
+      res.json({
+        taskId,
+        ...progress,
+        lastUpdated: new Date().toISOString()
+      });
+    });
+
     // Health check
     this.app.get('/health', (req, res) => {
       res.json({ status: 'healthy', timestamp: new Date().toISOString() });
@@ -140,7 +167,8 @@ class WorkspaceVisualizer {
         '**/.DS_Store',
         '**/node_modules/**',
         '**/*.tmp',
-        '**/*.swp'
+        '**/*.swp',
+        '**/archive/**'
       ],
       persistent: true,
       ignoreInitial: false,
@@ -157,14 +185,37 @@ class WorkspaceVisualizer {
   
   handleFileChange(filePath, eventType) {
     console.log(`📁 File ${eventType}: ${path.relative(this.workspaceDataDir, filePath)}`);
-    
+
+    // Ignore archived workspaces
+    if (filePath.includes('/archive/')) {
+      console.log(`📦 Ignoring archived file: ${path.basename(filePath)}`);
+      return;
+    }
+
     try {
       if (filePath.includes('todo/active.md')) {
         this.updateTasks(filePath);
       } else if (filePath.includes('PROGRESS.md')) {
-        this.updateWorkspaceProgress(filePath);
+        if (eventType === 'delete' || eventType === 'unlink') {
+          // Remove workspace from Map when its PROGRESS.md is deleted
+          const workspaceId = path.basename(path.dirname(filePath));
+          if (this.workspaces.has(workspaceId)) {
+            this.workspaces.delete(workspaceId);
+            console.log(`🗑️ Removed workspace ${workspaceId} from tracking`);
+          }
+        } else {
+          this.updateWorkspaceProgress(filePath);
+        }
       } else if (filePath.includes('README.md') && filePath.includes('/workspace/')) {
-        this.updateWorkspaceInfo(filePath);
+        if (eventType === 'delete' || eventType === 'unlink') {
+          const workspaceId = path.basename(path.dirname(filePath));
+          if (this.workspaces.has(workspaceId)) {
+            this.workspaces.delete(workspaceId);
+            console.log(`🗑️ Removed workspace ${workspaceId} from tracking`);
+          }
+        } else {
+          this.updateWorkspaceInfo(filePath);
+        }
       }
       
       // Broadcast update to all connected clients
@@ -175,7 +226,8 @@ class WorkspaceVisualizer {
         timestamp: new Date().toISOString(),
         data: {
           tasks: Array.from(this.tasks.values()),
-          workspaces: Array.from(this.workspaces.values())
+          workspaces: Array.from(this.workspaces.values()),
+          archivedTasks: this.getRecentArchivedTasks()
         }
       });
     } catch (error) {
@@ -239,11 +291,15 @@ class WorkspaceVisualizer {
     const tasks = [];
     const lines = content.split('\n');
     let currentTask = null;
-    
+
     for (const line of lines) {
       const taskMatch = line.match(/^- \[ \] (.+) #id:(\w+)$/);
       if (taskMatch) {
-        if (currentTask) tasks.push(currentTask);
+        if (currentTask) {
+          // Determine status based on workspace existence
+          currentTask.taskStatus = this.getTaskStatus(currentTask.id);
+          tasks.push(currentTask);
+        }
         currentTask = {
           title: taskMatch[1],
           id: taskMatch[2],
@@ -251,8 +307,7 @@ class WorkspaceVisualizer {
           created: new Date().toISOString().split('T')[0],
           due: null,
           tags: [],
-          context: '',
-          status: 'active'
+          context: ''
         };
       } else if (currentTask) {
         const priorityMatch = line.match(/^\s*- priority: (\w+)$/);
@@ -260,7 +315,7 @@ class WorkspaceVisualizer {
         const dueMatch = line.match(/^\s*- due: ([\d-]+)$/);
         const tagsMatch = line.match(/^\s*- tags: \[([^\]]*)\]$/);
         const contextMatch = line.match(/^\s*- context: (.+)$/);
-        
+
         if (priorityMatch) currentTask.priority = priorityMatch[1];
         if (createdMatch) currentTask.created = createdMatch[1];
         if (dueMatch) currentTask.due = dueMatch[1];
@@ -268,27 +323,152 @@ class WorkspaceVisualizer {
         if (contextMatch) currentTask.context = contextMatch[1];
       }
     }
-    
+
+    if (currentTask) {
+      currentTask.taskStatus = this.getTaskStatus(currentTask.id);
+      tasks.push(currentTask);
+    }
+    return tasks;
+  }
+
+  getTaskStatus(taskId) {
+    // Check if workspace exists for this task
+    const workspacePath = path.join(this.workspacesPath, taskId);
+    if (fs.existsSync(workspacePath)) {
+      return 'Ongoing';
+    }
+    return 'Not Started';
+  }
+
+  parseArchivedTodoFile(content) {
+    const tasks = [];
+    const lines = content.split('\n');
+    let currentTask = null;
+
+    for (const line of lines) {
+      const taskMatch = line.match(/^- \[x\] (.+) #id:(\w+)$/);
+      if (taskMatch) {
+        if (currentTask) tasks.push(currentTask);
+        currentTask = {
+          title: taskMatch[1],
+          id: taskMatch[2],
+          priority: 'p2',
+          created: null,
+          completed: null,
+          tags: [],
+          context: '',
+          taskStatus: 'Finished'
+        };
+      } else if (currentTask) {
+        const priorityMatch = line.match(/^\s*- priority: (\w+)$/);
+        const createdMatch = line.match(/^\s*- created: ([\d-]+)$/);
+        const completedMatch = line.match(/^\s*- completed: ([\d-]+)$/);
+        const tagsMatch = line.match(/^\s*- tags: \[([^\]]*)\]$/);
+        const contextMatch = line.match(/^\s*- context: (.+)$/);
+
+        if (priorityMatch) currentTask.priority = priorityMatch[1];
+        if (createdMatch) currentTask.created = createdMatch[1];
+        if (completedMatch) currentTask.completed = completedMatch[1];
+        if (tagsMatch) currentTask.tags = tagsMatch[1].split(', ').filter(t => t);
+        if (contextMatch) currentTask.context = contextMatch[1];
+      }
+    }
+
     if (currentTask) tasks.push(currentTask);
     return tasks;
+  }
+
+  getRecentArchivedTasks() {
+    const archivePath = path.join(this.todoPath, 'archive');
+    if (!fs.existsSync(archivePath)) {
+      return [];
+    }
+
+    const today = new Date();
+    const threeDaysAgo = new Date(today);
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+    const archivedTasks = [];
+
+    // Get archive files from last 3 days
+    const files = fs.readdirSync(archivePath)
+      .filter(f => f.endsWith('.md'))
+      .map(f => ({
+        name: f,
+        date: f.replace('.md', '')
+      }))
+      .filter(f => {
+        const fileDate = new Date(f.date);
+        return fileDate >= threeDaysAgo && fileDate <= today;
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    for (const file of files) {
+      const filePath = path.join(archivePath, file.name);
+      const content = fs.readFileSync(filePath, 'utf8');
+      const tasks = this.parseArchivedTodoFile(content);
+
+      // Add completed date from filename if not in task
+      tasks.forEach(task => {
+        if (!task.completed) {
+          task.completed = file.date;
+        }
+      });
+
+      archivedTasks.push(...tasks);
+    }
+
+    // Return max(all from 3 days, 10 tasks)
+    return archivedTasks.length >= 10 ? archivedTasks : archivedTasks.slice(0, 10);
+  }
+
+  getWorkspaceProgress(taskId) {
+    // Check active workspace first
+    let progressPath = path.join(this.workspacesPath, taskId, 'PROGRESS.md');
+
+    // If not found, check archived workspace
+    if (!fs.existsSync(progressPath)) {
+      progressPath = path.join(this.workspacesPath, 'archive', taskId, 'PROGRESS.md');
+    }
+
+    if (!fs.existsSync(progressPath)) {
+      return null;
+    }
+
+    const rawContent = fs.readFileSync(progressPath, 'utf8');
+    const parsed = this.parseProgressFile(rawContent);
+
+    return {
+      raw: rawContent,
+      ...parsed
+    };
   }
   
   parseProgressFile(content) {
     const statusMatch = content.match(/\*\*Status:\*\* ([^|]+)/);
+    const progressMatch = content.match(/\*\*Progress:\*\* (\d+)%/);
     const titleMatch = content.match(/# Progress: (.+)/);
-    const focusMatch = content.match(/## 🎯 Current Focus\s*\n([^\n]+)/);
-    
-    // Count completed phases
+    const focusMatch = content.match(/## Current Focus\s*\n([^\n#]+)/);
+
+    // Count completed phases from Next Actions
     const phases = content.match(/- \[x\]/g) || [];
     const totalPhases = (content.match(/- \[[x\s]\]/g) || []).length;
-    
+
+    // Use explicit progress if available, otherwise calculate from checkboxes
+    let progress = 0;
+    if (progressMatch) {
+      progress = parseInt(progressMatch[1], 10);
+    } else if (totalPhases > 0) {
+      progress = Math.round((phases.length / totalPhases) * 100);
+    }
+
     return {
       title: titleMatch?.[1]?.trim() || 'Unknown Task',
-      status: statusMatch?.[1]?.trim() || 'Unknown',
-      currentFocus: focusMatch?.[1]?.trim() || 'No current focus',
+      status: statusMatch?.[1]?.trim() || 'In Progress',
+      currentFocus: focusMatch?.[1]?.trim() || '',
       completedPhases: phases.length,
-      totalPhases: totalPhases || 5,
-      progress: totalPhases > 0 ? Math.round((phases.length / totalPhases) * 100) : 0
+      totalPhases: totalPhases || 0,
+      progress
     };
   }
   
@@ -315,10 +495,10 @@ class WorkspaceVisualizer {
       this.updateTasks(todoFile);
     }
     
-    // Load initial workspace data
+    // Load initial workspace data (exclude archive directory)
     if (fs.existsSync(this.workspacesPath)) {
       const workspaceDirs = fs.readdirSync(this.workspacesPath, { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith('.'))
+        .filter(dirent => dirent.isDirectory() && !dirent.name.startsWith('.') && dirent.name !== 'archive')
         .map(dirent => dirent.name);
       
       workspaceDirs.forEach(workspaceId => {
@@ -347,6 +527,7 @@ class WorkspaceVisualizer {
         type: 'initial_data',
         tasks: Array.from(this.tasks.values()),
         workspaces: Array.from(this.workspaces.values()),
+        archivedTasks: this.getRecentArchivedTasks(),
         timestamp: new Date().toISOString()
       }));
       

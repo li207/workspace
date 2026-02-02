@@ -21,13 +21,13 @@ fi
 
 # Sync workspace-data repo
 if [ -d "$WORKSPACE_DIR/workspace-data/.git" ]; then
-    echo "→ Workplace-data repo"
+    echo "→ Workspace-data repo"
     cd "$WORKSPACE_DIR/workspace-data"
     git add -A
     git diff --cached --quiet || git commit -m "sync: $(date '+%Y-%m-%d %H:%M')"
     git push 2>/dev/null || echo "  (no remote or push failed)"
 else
-    echo "  ⚠️ Workplace-data repo not initialized"
+    echo "  ⚠️ Workspace-data repo not initialized"
 fi
 
 echo "✅ Done"

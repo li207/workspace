@@ -9,93 +9,47 @@ args:
     required: false
 ---
 
-You are managing task workspaces using the Workspace system with natural language processing.
+Manage task workspaces. Config: `~/.claude/workspace-path.txt` → WORKSPACE_DATA_DIR
 
-## User Command: {{command}}
+## Command: {{command}}
 
-## Core Tasks:
+**Intents:** create/new | open/switch/"work on" | status/report | summarize/update | list/show | clean/archive | help
 
-1. **Load Configuration**: Read workspace paths from `~/.claude/workspace-path.txt`
-2. **Parse Intent**: Analyze command for: create, open, status, list, clean, help
-3. **Extract Info**: Task ID, TODO reference, workspace reference, action context
-4. **Execute**: Perform operation and respond clearly
+## Operations
 
-## Intent Patterns:
-- **Create**: "create", "make", "new", "setup" + workspace description
-- **Open/Switch**: "open", "switch", "work on", "access", "go to" + reference
-- **Status**: "status", "report", "where did I leave off", "what's next"
-- **List**: "list", "show", "see", "view" + optional filters
-- **Clean**: "clean", "remove", "delete", "archive" + scope
-- **Help**: "help", "manual", "guide"
+**CREATE** → Parse task ref (ID/position/description), create `workspace/{task-id}/` with: README.md, CLAUDE.md, PROGRESS.md, docs/, logs/, scratch/
 
-## Operations:
+**OPEN** → Resolve task ID, switch to workspace (auto-create if needed), read CLAUDE.md for context
 
-### CREATE
-- Parse task reference (ID, position, description)
-- Create directory: `WORKSPACE_DATA_DIR/workspace/{task-id}/`
-- Generate files: README.md, CLAUDE.md, PROGRESS.md, docs/, logs/, scratch/
-- Link to TODO task if ID provided
+**STATUS** → Read PROGRESS.md, show: progress summary, accomplishments, next actions, blockers
 
-### OPEN/SWITCH  
-- Parse task reference to resolve task ID
-- Switch to existing workspace or auto-create if needed
-- Read CLAUDE.md for workspace context
-- Show workspace status confirmation
+**SUMMARIZE/UPDATE** → Use current session context to update PROGRESS.md: add accomplishments, update current focus, revise next actions, note any blockers. Preserve existing content, append new items with timestamps.
 
-### STATUS/REPORT
-- Read PROGRESS.md from current/specified workspace
-- Display progress summary, accomplishments, next actions, blockers
-- Include task context and workspace information
+**LIST** → Show all workspaces with task title, priority, status, file counts. Sort by priority → created
 
-### LIST
-- Show all workspace directories with task context
-- Include task title, priority, workspace status, file counts
-- Sort by task priority, then creation date
+**CLEAN** → Archive completed workspaces, remove empty ones (confirm before delete)
 
-### CLEAN
-- Archive completed task workspaces
-- Remove empty/unused workspaces
-- Ask confirmation before deletion
+**HELP** → Read `modules/workspace/README.md` via Task tool
 
-### HELP
-Load full help: Use Task tool to read `modules/workspace/README.md`
+## Generated CLAUDE.md Template
+```
+# Task: {title} #id:{id}
+Priority: {priority} | Created: {date}
 
-## Workspace Templates:
-
-### CLAUDE.md
-```markdown
-# Claude Context - Task {id}: {title}
-## Current Workspace Context
-- Task ID: {id}
-- Progress File: ./PROGRESS.md
-- Active Since: {timestamp}
-## Task Context
+## Context
 {context from TODO}
+
+## Auto-Update Rule
+UPDATE PROGRESS.md at these checkpoints:
+- Significant code changes committed
+- Major milestone reached
+- Blocker encountered or resolved
+- Before ending session
+Format: Append to relevant section with timestamp [YYYY-MM-DD HH:MM]
 ```
 
-### PROGRESS.md
-```markdown
-# Progress: {title}
-**Status:** Getting Started
-## 🎯 Current Focus
-Starting work on: {title}
-## ✅ Recent Accomplishments  
-- Workspace created and initialized
-## 🚧 Next Actions
-1. Understand the problem
-2. Plan approach
-3. Begin work
-```
-
-## Error Handling:
-- No config → "Run bootstrap script first"
-- Task not found → Show current tasks for clarification
-- Workspace not found → Auto-create with TODO context
-- Ambiguous reference → Ask for clarification
-
-## File Paths:
-- Config: `~/.claude/workspace-path.txt`
+## Paths
 - Workspaces: `WORKSPACE_DATA_DIR/workspace/{task-id}/`
-- TODO Integration: `WORKSPACE_DATA_DIR/todo/active.md`
+- TODO: `WORKSPACE_DATA_DIR/todo/active.md`
 
-ARGUMENTS: {{command}}
+**Errors:** No config → run bootstrap | Task not found → show list | Ambiguous → ask clarification

@@ -1,189 +1,104 @@
-# Workspace - Intelligent Workspace Framework
+# Workspace Framework Reference
 
-An extensible, Claude-native workspace system featuring natural language processing and modular architecture.
-
-## Core Principles
-
-1. **Natural Language Processing** — Commands understand conversational intent, not rigid syntax
-2. **File-based Storage** — All data in human-readable markdown files
-3. **Privacy by Design** — Personal data completely separated from framework
-4. **Modular Architecture** — Commands, modules, and skills extend functionality independently  
-5. **Multi-User Ready** — Share framework, keep data private
-6. **Claude-Native** — Built specifically for Claude AI workflows
+Detailed reference for the workspace system. See `CLAUDE.md` for quick overview.
 
 ## Directory Structure
 
 ```
-workspace/                          # 🔓 Framework Repository (shareable)
-├── instructions.md                 # This file - master context for Claude
-├── CLAUDE.md                       # Claude Code shortcuts
-├── README.md                       # Public documentation
-├── bootstrap.sh                    # Setup script
-├── .gitignore                      # Excludes private data
-│
-├── commands/                       # Global Claude commands
-│   └── todo.md                    # Natural language TODO processor
-│
-├── modules/                        # Module specifications
-│   ├── todo/                      # TODO module definition
-│   │   └── README.md
-│   └── [future-modules]/          # Notes, calendar, projects, etc.
-│
-├── .skills/                        # Custom Claude skills (optional)
-│   ├── todo/
-│   │   └── SKILL.md
-│   └── [future-skills]/
-│
-├── scripts/                        # Automation utilities
-│   ├── bootstrap.sh               # Moved to root
-│   └── sync.sh                    # Dual-repo syncing
-│
-└── workspace-data/                 # 🔒 Private Data Repository (gitignored)
-    ├── todo/                       # Task management data
-    │   ├── active.md              # Current tasks with context
-    │   └── archive/               # Completed tasks by date
-    │       └── 2026-01-31.md
-    │
-    └── [future-data]/              # Notes, calendar, projects, etc.
+workspace/                          # Framework (shareable)
+├── commands/                       # Global commands → ~/.claude/commands/
+│   ├── todo.md
+│   ├── visual.md
+│   └── workspace.md
+├── modules/                        # Module specs
+│   ├── todo/README.md
+│   ├── visual/README.md
+│   └── workspace/README.md
+└── workspace-data/                 # Private data (gitignored)
+    ├── todo/
+    │   ├── active.md
+    │   └── archive/
+    └── workspace/
+        ├── {task-id}/
+        └── archive/
 ```
 
-## Active Commands
+## Command Details
 
-### 🗣️ Natural Language TODO (`/todo`)
-**Location**: Global command - works from anywhere
-**Processor**: `commands/todo.md`
-**Data**: `workspace-data/todo/`
+### /todo
+Natural language task management.
 
-**Natural Language Examples:**
-```bash
-# Creating tasks
-/todo create API integration task, urgent, due tomorrow
-/todo add client meeting friday, needs budget discussion
-/todo new security audit, reference OWASP guidelines
+**Intents:** create | list | done/complete | update | review | help
 
-# Managing tasks
-/todo list                          # Numbered task display  
-/todo mark first task as done       # Complete by position
-/todo change task 2 to high priority # Update by reference
-/todo what's overdue?               # Smart filtering
+**Parsing:**
+- Priorities: urgent/critical → p0, high → p1, medium → p2, low → p3
+- Dates: tomorrow, friday, "feb 15", "next monday", "in 3 days"
+- Context: Everything after main task description
 
-# Getting insights  
-/todo review                        # Summary with alerts
-/todo show my current workload      # Status overview
-```
+### /workspace
+Task-specific isolated environments.
 
-**Enhanced Data Format:**
+**Intents:** create | open | status | summarize | list | clean | help
+
+**Creates:** README.md, CLAUDE.md, PROGRESS.md, docs/, logs/, scratch/
+
+### /visual
+Dashboard visualization server.
+
+**Intents:** start | stop | status | open | (default: start + open)
+
+## Data Formats
+
+### Task (active.md)
 ```markdown
-- [ ] Clean, actionable task title #id:abc123
-  - priority: high
+- [ ] Task title #id:abc123
+  - priority: p1
   - created: 2026-01-31
   - due: 2026-02-02
   - tags: [security, backend]
-  - context: Detailed requirements, links to docs, coordination notes, POC details
+  - context: Requirements and notes
 ```
 
-## Extension Patterns
-
-### Adding Commands (Global Claude Commands)
-1. **Create**: `commands/command-name.md` with natural language processing
-2. **Install**: Bootstrap copies to `~/.claude/commands/`
-3. **Use**: Available globally as `/command-name`
-
-**Command Template:**
+### Completed Task (archive/YYYY-MM-DD.md)
 ```markdown
----
-title: Command Name
-description: Natural language command processor
-user-invocable: true
-args:
-  - name: command
-    description: Natural language input
-    type: string
-    required: true
----
-
-[Natural language processing logic here]
+- [x] Task title #id:abc123
+  - priority: p1
+  - created: 2026-01-31
+  - due: 2026-02-02
+  - completed: 2026-02-01
+  - tags: [security, backend]
+  - context: Implementation notes
 ```
 
-### Adding Modules (Feature Specifications)
-1. **Document**: `modules/module-name/README.md` with:
-   - Purpose and use cases
-   - Data format specifications  
-   - Natural language patterns
-   - Integration guidelines
+### Workspace PROGRESS.md
+```markdown
+# Progress: {task-title}
 
-2. **Data Structure**: `workspace-data/module-name/` for storage
-3. **Commands**: Optional global commands in `commands/`
-4. **Skills**: Optional specialized skills in `.skills/`
+## Accomplishments
+- [YYYY-MM-DD HH:MM] Completed X
 
-### Adding Skills (Claude Capabilities)  
-1. **Create**: `.skills/skill-name/SKILL.md`
-2. **Activate**: Reference in this instructions.md
-3. **Scope**: Context-specific Claude behaviors
+## Current Focus
+Working on Y
 
-## Future Extensions
+## Next Actions
+- [ ] Do Z
 
-### Potential Modules
-- **Notes** (`/note`) — Knowledge management with linking
-- **Calendar** (`/cal`) — Schedule and meeting management  
-- **Projects** (`/project`) — Multi-task project tracking
-- **Journal** (`/journal`) — Daily reflection and logging
-- **Contacts** (`/contact`) — People and relationship management
+## Blockers
+None
+```
 
-### Extension Guidelines
-- **Natural Language First** — Design for conversational interaction
-- **Data Separation** — Keep personal data in `workspace-data/`
-- **Privacy Aware** — Never commit personal data to framework repo
-- **Documentation Driven** — Specify formats and patterns clearly
-- **Interoperable** — Modules should work together when possible
+## Extension Pattern
 
-## Session Context
+### Adding Commands
+1. Create `commands/name.md` with frontmatter and processing logic
+2. Run `./bootstrap.sh` to install to `~/.claude/commands/`
 
-When Claude starts in this directory:
+### Adding Modules
+1. Create `modules/name/README.md` with specs
+2. Create `workspace-data/name/` for storage
+3. Optional: Create matching command
 
-1. **Read Context**: This instructions.md provides system understanding
-2. **Module Access**: Refer to `modules/<name>/README.md` for specifics
-3. **Data Location**: All personal operations in `workspace-data/`
-4. **Commands Available**: Global commands work from anywhere
-5. **Extension Patterns**: Follow documented patterns for new features
+## ID Generation
 
-## Git Architecture
-
-### Dual Repository System
-1. **Framework Repository** (this directory):
-   - **Scope**: Commands, modules, documentation, scripts
-   - **Sharing**: Public or team-shared
-   - **Updates**: Pull to get new features and improvements
-
-2. **Data Repository** (`workspace-data/`):
-   - **Scope**: Personal tasks, notes, and information
-   - **Sharing**: Private individual repositories  
-   - **Updates**: Independent personal data management
-
-3. **Isolation**: `workspace-data/` gitignored from framework repo
-
-### Multi-User Benefits
-- **Teams**: Share framework improvements, keep data private
-- **Individuals**: Customize data structure, sync framework updates  
-- **Organizations**: Standardize tooling, respect privacy
-- **Open Source**: Framework improvements benefit everyone
-
-## Development Workflow
-
-### Framework Contributions
-1. **Fork/Clone**: Framework repository
-2. **Develop**: New commands, modules, improvements
-3. **Test**: With sample data (not real personal data)
-4. **Submit**: Pull request with documentation
-5. **Document**: Update instructions and README
-
-### Personal Customization
-1. **Commands**: Add custom commands to `commands/`
-2. **Modules**: Define personal module specifications
-3. **Data**: Structure personal data in `workspace-data/`
-4. **Skills**: Create specialized Claude behaviors
-5. **Sync**: Use sync script for dual-repo management
-
----
-
-This framework grows with your needs while keeping your data private and your tools shareable.
+6-character alphanumeric: `#id:abc123`
+Generated from timestamp + content hash.

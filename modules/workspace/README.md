@@ -18,6 +18,8 @@ The Workspace module creates and manages isolated folder environments for indivi
 | `workspace-data/workspace/` | Root workspace directory |
 | `workspace-data/workspace/{task-id}/` | Individual task workspace |
 | `workspace-data/workspace/{task-id}/README.md` | Workspace overview with task details |
+| `workspace-data/workspace/{task-id}/CLAUDE.md` | Task context for Claude sessions |
+| `workspace-data/workspace/{task-id}/PROGRESS.md` | Progress tracking and status updates |
 | `workspace-data/workspace/{task-id}/docs/` | Documentation directory |
 | `workspace-data/workspace/{task-id}/logs/` | Log files and investigation notes |
 | `workspace-data/workspace/{task-id}/scratch/` | Temporary files and experiments |
@@ -48,15 +50,17 @@ The Workspace module creates and manages isolated folder environments for indivi
 ```
 {task-id}/
 ├── README.md           # Workspace overview
-├── docs/              # Documentation
+├── CLAUDE.md           # Task context for Claude
+├── PROGRESS.md         # Progress tracking
+├── docs/               # Documentation
 │   ├── requirements.md
 │   ├── api-spec.md
 │   └── investigation.md
-├── logs/              # Investigation logs
+├── logs/               # Investigation logs
 │   ├── debug.log
 │   ├── error-traces.md
 │   └── timeline.md
-└── scratch/           # Temporary work
+└── scratch/            # Temporary work
     ├── notes.md
     ├── experiments/
     └── prototypes/

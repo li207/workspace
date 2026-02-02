@@ -9,80 +9,56 @@ args:
     required: false
 ---
 
-You are managing tasks using the Workspace TODO system with natural language processing.
+Manage tasks via natural language. Config: `~/.claude/workspace-path.txt` → WORKSPACE_DATA_DIR
 
-## User Command: {{command}}
+## Command: {{command}}
 
-## Core Tasks:
+**Intents:** create/add/new | list/show | done/complete | update/change | review/status | help
 
-1. **Load Configuration**: Read workspace paths from `~/.claude/workspace-path.txt`
-2. **Parse Intent**: Analyze command for: create, list, complete, update, review, help
-3. **Extract Data**: Parse task info, priorities (p0-p3), dates, tags, context
-4. **Execute**: Perform operation and respond clearly
+## Operations
 
-## Intent Patterns:
-- **Create**: "create", "add", "new", "make" + task description
-- **List**: "list", "show", "view", "see" + optional filters
-- **Complete**: "done", "complete", "finish", "mark" + task reference
-- **Update**: "change", "update", "modify", "edit" + task + changes
-- **Review**: "review", "summary", "status", "workload"
-- **Help**: "help", "manual", "guide", "how"
-
-## Operations:
-
-### CREATE
-- Generate 6-char random ID
-- Parse: priority (p0/urgent→p0, p1/high→p1, p2/medium→p2, p3/low→p3)
-- Parse: dates (tomorrow, friday, "feb 15", "in 3 days")
-- Parse: context (everything after main task description)
-- Format: `- [ ] <title> #id:<id>` with metadata
-
-### LIST  
-- Read `active.md`, sort by overdue → due date → priority → created
-- Number tasks, show: priority, title, due date, ID
-- Format: "1. [P1] Task title (due: date) #id"
-
-### COMPLETE
-- Parse task reference: number, description, or ID
-- Move from active.md to archive/YYYY-MM-DD.md with completion date
-- Add completion context if task was significant
-- **Archive workspace integration**: If workspace exists for task ID, move it to archive
-  - Check: `WORKSPACE_DATA_DIR/workspace/{task-id}/`
-  - Move to: `WORKSPACE_DATA_DIR/workspace/archive/{task-id}/`
-  - Preserve all files and update PROGRESS.md with completion status
-
-### UPDATE
-- Parse what to change: priority, due, title, context, tags
-- Update specified fields in active.md
-
-### REVIEW
-- Count by priority, show overdue, due this week, no dates
-- Alert on overdue tasks
-
-### HELP
-Load full help: Use Task tool to read `modules/todo/README.md`
-
-## Data Format:
-```markdown
-- [ ] Task title #id:abc123
+**CREATE** → Generate 6-char ID, parse priority (p0-p3/urgent/high/medium/low), dates (tomorrow/friday/"feb 15"/"in 3 days"), context. Format:
+```
+- [ ] Title #id:abc123
   - priority: p2
-  - created: YYYY-MM-DD  
-  - due: YYYY-MM-DD (if specified)
-  - tags: [tag1, tag2] (if specified)
-  - context: Additional details (if provided)
+  - created: YYYY-MM-DD
+  - due: YYYY-MM-DD
+  - tags: [tag1]
+  - context: Details
 ```
 
-## Error Handling:
-- No config → "Run bootstrap script first"
-- No task found → Show numbered list for clarification  
-- Ambiguous reference → Ask which task
-- No active tasks → Suggest creating one
+**Status (automatic):**
+- **Not Started** (gray): No workspace created for task
+- **Ongoing** (blue): Workspace exists at `workspace/{id}/`
+- **Finished** (green): Task archived, workspace moved to `workspace/archive/{id}/`
 
-## File Paths:
-- Config: `~/.claude/workspace-path.txt`
+**Auto-context:** When no context provided, generate based on title keywords:
+- "bug/fix/issue/error" → "Investigate and resolve the issue"
+- "add/implement/create/build" → "Implement and test the feature"
+- "review/check" → "Review and provide feedback"
+- "update/change/modify" → "Update the existing implementation"
+- "test/verify" → "Write and run tests to verify functionality"
+- "document/docs" → "Write or update documentation"
+- Default → "Complete the task as described"
+
+**LIST** → Read `active.md`, sort: overdue → due → priority → created. Format: "1. [P1] Title (due: date) [status] #id"
+
+**COMPLETE** → Match by number/description/ID. Before archiving:
+1. If workspace exists at `workspace/{id}/PROGRESS.md`:
+   - Read accomplishments section
+   - Summarize key steps/solutions (1-2 sentences)
+   - Append summary to task context
+2. Move task to `archive/YYYY-MM-DD.md` with `- completed: YYYY-MM-DD`
+3. If workspace exists, move `workspace/{id}/` to `workspace/archive/{id}/`
+
+**UPDATE** → Modify priority/due/title/context/tags in active.md
+
+**REVIEW** → Count by priority and status, alert overdue, show due this week
+
+**HELP** → Read `modules/todo/README.md` via Task tool
+
+## Paths
 - Active: `WORKSPACE_DATA_DIR/todo/active.md`
 - Archive: `WORKSPACE_DATA_DIR/todo/archive/YYYY-MM-DD.md`
-- Workspace active: `WORKSPACE_DATA_DIR/workspace/{task-id}/`
-- Workspace archive: `WORKSPACE_DATA_DIR/workspace/archive/{task-id}/`
 
-ARGUMENTS: {{command}}
+**Errors:** No config → run bootstrap | No task → show list | Ambiguous → ask clarification

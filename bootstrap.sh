@@ -26,7 +26,8 @@ echo "    Data: $WORKSPACE_DIR/workspace-data"
 echo "→ Installing global commands"
 if [ -d "$WORKSPACE_DIR/commands" ]; then
     cp "$WORKSPACE_DIR/commands"/*.md "$CLAUDE_DIR/commands/" 2>/dev/null || true
-    echo "  ✓ TODO command installed globally"
+    COMMAND_COUNT=$(ls -1 "$WORKSPACE_DIR/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
+    echo "  ✓ $COMMAND_COUNT commands installed globally (todo, visual, workspace)"
 else
     echo "  ⚠️  No commands directory found"
 fi
@@ -55,6 +56,7 @@ fi
 
 # Create necessary data directories in workspace-data
 mkdir -p "$WORKSPACE_DIR/workspace-data/todo/archive"
+mkdir -p "$WORKSPACE_DIR/workspace-data/workspace/archive"
 
 # Create initial TODO file if it doesn't exist
 if [ ! -f "$WORKSPACE_DIR/workspace-data/todo/active.md" ]; then
@@ -76,11 +78,15 @@ echo "✅ Bootstrap complete!"
 echo ""
 echo "Next steps:"
 echo "1. Use '/todo review' from anywhere to get started"
-echo "2. Try: /todo add \"Test the system\" --priority high"
+echo "2. Try: /todo create \"Test the system\" high priority"
 echo "3. Sync data: cd workspace-data && git remote add origin <your-private-repo>"
 echo ""
 echo "Available commands:"
-echo "- /todo <operation> - Global TODO management (works from anywhere)"
+echo "- /todo      - Natural language task management"
+echo "- /visual    - Real-time workspace visualization"
+echo "- /workspace - Task-specific isolated environments"
+echo ""
+echo "Utilities:"
 echo "- ./scripts/sync.sh - Sync both framework and data repos"
 echo ""
 echo "Data location: $WORKSPACE_DIR/workspace-data/"

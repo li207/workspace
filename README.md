@@ -61,30 +61,34 @@ The bootstrap will ask for your workspace-data repository:
 ### Framework Structure
 ```
 workspace/                    # 🔓 Public Framework (this repo)
-├── commands/                 # Global Claude commands 
+├── commands/                 # Global Claude commands
 │   ├── todo.md              # Natural language TODO processor
+│   ├── visual.md            # Visualization dashboard
 │   └── workspace.md         # Natural language workspace manager
 ├── modules/                  # Module definitions
 │   ├── todo/                # TODO system documentation
+│   ├── visual/              # Visualization server
 │   └── workspace/           # Workspace system documentation
 ├── scripts/                  # Automation tools
-│   ├── bootstrap.sh         # Setup script
-│   └── sync.sh             # Dual-repo sync
+│   └── sync.sh              # Dual-repo sync
+├── bootstrap.sh             # Setup script
 ├── instructions.md          # Claude context
-└── CLAUDE.md               # Quick reference
+└── CLAUDE.md                # Quick reference
 
 workspace-data/              # 🔒 Private Data (separate repo)
-├── todo/                   
+├── todo/
 │   ├── active.md           # Current tasks
 │   └── archive/            # Completed tasks by date
 │       └── 2026-01-31.md
 └── workspace/              # Isolated task workspaces
-    ├── 1769a4/            # Task-specific workspace
-    │   ├── README.md      # Workspace overview
-    │   ├── docs/          # Documentation
-    │   ├── logs/          # Investigation logs
-    │   └── scratch/       # Temporary files
-    └── 176984/            # Another task workspace
+    ├── {task-id}/          # Task-specific workspace
+    │   ├── README.md       # Workspace overview
+    │   ├── CLAUDE.md       # Task context for Claude
+    │   ├── PROGRESS.md     # Progress tracking
+    │   ├── docs/           # Documentation
+    │   ├── logs/           # Investigation logs
+    │   └── scratch/        # Temporary files
+    └── archive/            # Archived workspaces
 ```
 
 ### Privacy Model
@@ -127,11 +131,21 @@ Isolated task-specific environments that understand conversational commands:
 # Accessing workspaces
 /workspace open 1769a4              # Navigate to workspace
 /workspace list                     # See all workspaces
-/workspace info auth bug            # Workspace details
+/workspace status                   # Show progress
 
 # Managing workspaces
-/workspace clean completed workspaces
-/workspace help                     # Comprehensive workspace guide
+/workspace summarize                # Update progress notes
+/workspace clean completed          # Archive finished workspaces
+```
+
+### 📊 Visual Dashboard
+Real-time workspace visualization and monitoring:
+
+```bash
+/visual                             # Start and open dashboard
+/visual start                       # Start server only
+/visual stop                        # Stop server
+/visual status                      # Check server status
 ```
 
 ## Multi-User Setup
