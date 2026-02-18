@@ -1,5 +1,6 @@
 # Private data folder (separate git repo)
 /workspace-data/
+/wiki-data/
 
 # OS files
 .DS_Store

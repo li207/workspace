@@ -8,9 +8,11 @@ Detailed reference for the workspace system. See `CLAUDE.md` for quick overview.
 workspace/                          # Framework (shareable)
 ├── commands/                       # Global commands → ~/.claude/commands/
 │   ├── task.md
+│   ├── wiki.md
 │   └── visual.md
 ├── modules/                        # Module specs
 │   ├── task/README.md
+│   ├── wiki/README.md
 │   └── visual/README.md
 └── workspace-data/                 # Private data (gitignored)
     ├── dashboard.md                    # Auto-generated canonical view
@@ -26,6 +28,15 @@ workspace/                          # Framework (shareable)
     ├── archive/
     │   └── {task-id}/
     └── weeks/
+
+~/projects/team-wiki/               # Wiki data (separate folder)
+├── wiki-index.md                       # Auto-generated table of contents
+├── how-to/
+├── architecture/
+├── troubleshooting/
+├── onboarding/
+├── reference/
+└── uncategorized/
 ```
 
 ## Command Details
@@ -46,6 +57,22 @@ Unified task and workspace management via natural language.
 Dashboard visualization server.
 
 **Intents:** start | stop | status | open | (default: start + open)
+
+### /wiki
+Knowledge base management with auto-extraction from completed tasks.
+
+**Intents:** create | list | open | edit | search | harvest | move | delete | review | help
+
+**Articles stored in:** `WIKI_DIR` (default: `~/projects/team-wiki/`)
+
+**Categories:** how-to, architecture, troubleshooting, onboarding, reference, uncategorized
+
+**Key features:**
+- Auto-extract articles from archived tasks via `/wiki harvest`
+- Wiki-worthiness scoring suggests articles on `/task done`
+- `[[wiki-links]]` for internal cross-references
+- Auto-generated `wiki-index.md` as table of contents
+- Category auto-detection from article title keywords
 
 ## Data Formats
 

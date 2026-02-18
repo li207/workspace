@@ -170,6 +170,11 @@ None
 4. Move `active/{id}/` → `archive/{id}/`
 5. Append to weekly summary (`weeks/YYYY-MM-DD.md`, Monday date)
 6. Regenerate dashboard.md
+7. **Wiki suggestion hook**: If `WIKI_DIR` is configured in `~/.claude/workspace-path.txt`, score the completed task for wiki-worthiness:
+   - PLAN.md >= 3 steps (+3), Accomplishments >= 3 entries (+2), architecture/design tags (+2), bug fix with notes (+3), Decisions entries (+2), docs/ has content (+2), duration >= 3 days (+1), p0/p1 priority (+1)
+   - If score >= 4: suggest creating a wiki article with proposed title, category, and outline
+   - User can: **accept** (creates draft in WIKI_DIR), **skip**, or **later** (skipped for now, included in next `/wiki harvest`)
+   - If accepted: create article with `status: draft` and `source-task: {task-id}`, regenerate `wiki-index.md`
 
 **UPDATE** → Auto-detect intent from input:
 - Metadata changes (priority/due/tags) → update task.md, regenerate dashboard.md

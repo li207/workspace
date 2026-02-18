@@ -7,15 +7,18 @@ Personal task management with natural language commands.
 | Command | Purpose |
 |---------|---------|
 | `/task` | Unified task & workspace management (create, list, open, done, update, plan, review) |
+| `/wiki` | Knowledge base management (create, list, search, harvest, review) |
 | `/visual` | Real-time dashboard visualization |
 
 ## Data Paths
 
-- **Config**: `~/.claude/workspace-path.txt` → WORKSPACE_DATA_DIR
+- **Config**: `~/.claude/workspace-path.txt` → WORKSPACE_DATA_DIR, WIKI_DIR
 - **Index**: `WORKSPACE_DATA_DIR/dashboard.md`
 - **Active tasks**: `WORKSPACE_DATA_DIR/active/{task-id}/`
 - **Archive**: `WORKSPACE_DATA_DIR/archive/{task-id}/`
 - **Weekly summaries**: `WORKSPACE_DATA_DIR/weeks/`
+- **Wiki articles**: `WIKI_DIR/{category}/{article}.md` (default: `~/projects/team-wiki/`)
+- **Wiki index**: `WIKI_DIR/wiki-index.md`
 - **Obsidian vault**: `workspace-data/` (open as vault root, dashboard.md is entry point)
 
 ## Task Folder Structure
@@ -39,6 +42,12 @@ active/{task-id}/
 /task open first task
 /task done auth bug
 /task review
+
+/wiki create how to deploy to staging
+/wiki list
+/wiki search deploy
+/wiki harvest
+/wiki review
 
 /visual start
 ```

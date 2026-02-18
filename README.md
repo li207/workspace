@@ -62,9 +62,11 @@ The bootstrap will ask for your workspace-data repository:
 workspace/                    # Public Framework (this repo)
 ├── commands/                 # Global Claude commands
 │   ├── task.md              # Unified task & workspace management
+│   ├── wiki.md              # Knowledge base management
 │   └── visual.md            # Visualization dashboard
 ├── modules/                  # Module definitions
 │   ├── task/                # Task system documentation
+│   ├── wiki/                # Wiki knowledge base
 │   └── visual/              # Visualization server
 ├── scripts/                  # Automation tools
 │   └── sync.sh              # Dual-repo sync
@@ -86,6 +88,15 @@ workspace-data/              # Private Data (separate repo)
 ├── archive/                 # Completed tasks
 │   └── {task-id}/           # Archived task folder
 └── weeks/                   # Weekly summaries
+
+~/projects/team-wiki/        # Wiki Knowledge Base (separate folder)
+├── wiki-index.md            # Auto-generated table of contents
+├── how-to/                  # Step-by-step guides
+├── architecture/            # System design docs
+├── troubleshooting/         # Debugging guides
+├── onboarding/              # Setup & getting started
+├── reference/               # Quick reference material
+└── uncategorized/           # Other articles
 ```
 
 ### Privacy Model
@@ -126,6 +137,28 @@ Real-time workspace visualization and monitoring:
 /visual start                       # Start server only
 /visual stop                        # Stop server
 /visual status                      # Check server status
+```
+
+### /wiki — Knowledge Base
+Team knowledge base with auto-extraction from completed tasks:
+
+```bash
+# Create articles
+/wiki create how to deploy to staging
+/wiki create auth system overview, category: architecture
+
+# Browse and search
+/wiki list                              # Show all articles
+/wiki list how-to                       # Filter by category
+/wiki search deploy                     # Search by keyword
+
+# Auto-extract from completed tasks
+/wiki harvest                           # Scan archive, suggest articles
+
+# Manage
+/wiki edit deploy-to-staging            # Update an article
+/wiki move article-name to onboarding   # Recategorize
+/wiki review                            # Rebuild wiki-index.md
 ```
 
 ## Multi-User Setup
