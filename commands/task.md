@@ -15,7 +15,7 @@ Manage tasks via natural language. Config: `~/.claude/workspace-path.txt` → WO
 
 ## Command: {{command}}
 
-**Intents:** create/add/new | list/show | open/"work on" | done/complete | update/change | plan | review/status | help
+**Intents:** create/add/new | list/show | open/"work on" | done/complete | update/change | plan | review/status | upload | help
 
 ## Data Layout
 
@@ -200,19 +200,29 @@ None
 
 **REVIEW** → Full scan and sync. Scan all `active/*/task.md` + `active/*/PROGRESS.md` to build fresh state. Regenerate `dashboard.md`. Then display: count by priority, overdue alerts, this week's completions, link to weekly summary. Use this to fix stale dashboard or after manual Obsidian edits.
 
+**UPLOAD** → Sync workspace-data to GitHub:
+1. `cd` into the `WORKSPACE_DATA_DIR` path (from `~/.claude/workspace-path.txt`)
+2. Run `git status` to check for changes
+3. If no changes: report "Already up to date" and stop
+4. Stage all changes: `git add -A`
+5. Auto-generate a commit message summarizing the changes (new tasks, archives, progress updates, etc.)
+6. Commit and push to `origin main`
+7. Report: number of files changed, commit hash, and the GitHub repo URL (`https://github.com/lizhongzhang_microsoft/workspace-data`)
+
 **HELP** → Read `modules/task/README.md` via Task tool
 
 ## Worktree Lifecycle
 
-Every task gets its own git worktree for full isolation. Worktrees live under `~/projects/yolo-worktrees/` (or a sibling of the repo root for non-yolo repos).
+Every task gets its own git worktree for full isolation. All worktrees live under `~/projects/worktrees/` and are named `{repo-name}-{slug}` (e.g. `yolo-gateway-load-testing`, `mango-update-papyrus`).
 
 ### CREATE — worktree setup
 
 1. **Ask for repo** (if not obvious from context): Default is `~/projects/yolo`. Accept absolute path or known alias. Store as `repo` in task.md.
 2. **Derive branch name**: Slugify the task title → `lizhongzhang/{slug}` (lowercase, hyphens, max 50 chars). E.g. "Gateway Load Testing" → `lizhongzhang/gateway-load-testing`. Store as `branch` in task.md.
-3. **Derive worktree path**: `~/projects/yolo-worktrees/{slug}` for yolo repo, or `~/projects/{repo-name}-worktrees/{slug}` for other repos.
+3. **Derive worktree path**: Extract the repo directory name (e.g. `yolo`, `mango`) from the repo path. Worktree path is always `~/projects/worktrees/{repo-name}-{slug}`. E.g. repo `~/projects/yolo` + slug `gateway-load-testing` → `~/projects/worktrees/yolo-gateway-load-testing`. Repo `~/projects/mango` + slug `update-papyrus` → `~/projects/worktrees/mango-update-papyrus`.
 4. **Create worktree + branch**:
    ```bash
+   mkdir -p ~/projects/worktrees
    git -C {repo} fetch origin main
    git -C {repo} worktree add -b {branch} {worktree-path} origin/main
    ```
