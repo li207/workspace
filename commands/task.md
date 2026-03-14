@@ -39,7 +39,7 @@ workspace-data/
 
 ## Operations
 
-**CREATE** → Generate 6-char ID, parse priority (p0-p3/urgent/high/medium/low), dates (tomorrow/friday/"feb 15"/"in 3 days"), context. Create `active/{id}/` with: task.md, PLAN.md, PROGRESS.md, CLAUDE.md, docs/, logs/, scratch/. Regenerate dashboard.md.
+**CREATE** → Generate 6-char ID, parse priority (p0-p3/urgent/high/medium/low), dates (tomorrow/friday/"feb 15"/"in 3 days"), context. Create `active/{id}/` with: task.md, PLAN.md, PROGRESS.md, CLAUDE.md, docs/, logs/, scratch/. Create git worktree (see Worktree Lifecycle below). Regenerate dashboard.md.
 
 **task.md template:**
 ```markdown
@@ -49,6 +49,9 @@ workspace-data/
 - **created**: YYYY-MM-DD
 - **due**: YYYY-MM-DD
 - **tags**: [tag1, tag2]
+- **repo**: {absolute path to git repo}
+- **worktree**: {absolute path to worktree}
+- **branch**: {branch name}
 
 ## Context
 {Details, requirements, notes}
@@ -124,7 +127,8 @@ Check for user edits made via Obsidian since last session.
 
 ## Status
 - **State**: Not Started
-- **Branch**: {git branch if applicable}
+- **Branch**: {branch name}
+- **Worktree**: {absolute path to worktree}
 - **Last session**: {date}
 - **Summary**: Workspace created
 - **Next action**: Review PLAN.md and define approach
@@ -162,15 +166,17 @@ None
 1. Read `active/{id}/CLAUDE.md` for context
 2. Re-read `active/{id}/PLAN.md` and `active/{id}/PROGRESS.md`
 3. Check for user edits made via Obsidian since last session
+4. **Switch to worktree**: Read `repo` and `worktree` from `active/{id}/task.md`. Run `cd {worktree}` so all subsequent commands operate in the task's worktree. Confirm the switch to the user.
 
 **DONE** → Match by number/description/ID. Before archiving:
 1. Update PROGRESS.md with final summary in Accomplishments
 2. Set State to "Done" in Status block
 3. Add `- **completed**: YYYY-MM-DD` to task.md, add summary to Context
-4. Move `active/{id}/` → `archive/{id}/`
-5. Append to weekly summary (`weeks/YYYY-MM-DD.md`, Monday date)
-6. Regenerate dashboard.md
-7. **Wiki suggestion hook**: If `WIKI_DIR` is configured in `~/.claude/workspace-path.txt`, score the completed task for wiki-worthiness:
+4. **Delete worktree**: Read `repo` and `worktree` from `active/{id}/task.md`. If the worktree path exists, run `git -C {repo} worktree remove {worktree}` to cleanly remove it. If the branch was fully merged, also delete the local branch with `git -C {repo} branch -d {branch}`. If removal fails (dirty worktree), warn the user and skip — don't force-remove.
+5. Move `active/{id}/` → `archive/{id}/`
+6. Append to weekly summary (`weeks/YYYY-MM-DD.md`, Monday date)
+7. Regenerate dashboard.md
+8. **Wiki suggestion hook**: If `WIKI_DIR` is configured in `~/.claude/workspace-path.txt`, score the completed task for wiki-worthiness:
    - PLAN.md >= 3 steps (+3), Accomplishments >= 3 entries (+2), architecture/design tags (+2), bug fix with notes (+3), Decisions entries (+2), docs/ has content (+2), duration >= 3 days (+1), p0/p1 priority (+1)
    - If score >= 4: suggest creating a wiki article with proposed title, category, and outline
    - User can: **accept** (creates draft in WIKI_DIR), **skip**, or **later** (skipped for now, included in next `/wiki harvest`)
@@ -195,6 +201,35 @@ None
 **REVIEW** → Full scan and sync. Scan all `active/*/task.md` + `active/*/PROGRESS.md` to build fresh state. Regenerate `dashboard.md`. Then display: count by priority, overdue alerts, this week's completions, link to weekly summary. Use this to fix stale dashboard or after manual Obsidian edits.
 
 **HELP** → Read `modules/task/README.md` via Task tool
+
+## Worktree Lifecycle
+
+Every task gets its own git worktree for full isolation. Worktrees live under `~/projects/yolo-worktrees/` (or a sibling of the repo root for non-yolo repos).
+
+### CREATE — worktree setup
+
+1. **Ask for repo** (if not obvious from context): Default is `~/projects/yolo`. Accept absolute path or known alias. Store as `repo` in task.md.
+2. **Derive branch name**: Slugify the task title → `lizhongzhang/{slug}` (lowercase, hyphens, max 50 chars). E.g. "Gateway Load Testing" → `lizhongzhang/gateway-load-testing`. Store as `branch` in task.md.
+3. **Derive worktree path**: `~/projects/yolo-worktrees/{slug}` for yolo repo, or `~/projects/{repo-name}-worktrees/{slug}` for other repos.
+4. **Create worktree + branch**:
+   ```bash
+   git -C {repo} fetch origin main
+   git -C {repo} worktree add -b {branch} {worktree-path} origin/main
+   ```
+5. Store `repo`, `worktree`, and `branch` in both task.md and PROGRESS.md.
+6. Confirm to user: "Created worktree at {path} on branch {branch}"
+
+### OPEN — switch to worktree
+
+After reading task context files, `cd` into the task's worktree path so all subsequent commands run there. Print the working directory to confirm.
+
+### DONE — worktree cleanup
+
+Before archiving:
+1. Check if worktree has uncommitted changes (`git -C {worktree} status --porcelain`)
+2. If clean: `git -C {repo} worktree remove {worktree-path}`
+3. If the branch is fully merged: `git -C {repo} branch -d {branch}`
+4. If dirty: warn the user, ask whether to force-remove or skip. Never force-remove without confirmation.
 
 ## dashboard.md Generation
 
